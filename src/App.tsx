@@ -1,4 +1,4 @@
-import type { JSX, SVGProps } from 'react'
+import type { SVGProps, JSX } from 'react'
 import { motion } from 'framer-motion'
 
 type SquadMember = {
@@ -78,7 +78,7 @@ const squad: SquadMember[] = [
   { name: 'Pleiades', role: 'Coordination', Icon: StarIcon },
 ]
 
-const process = [
+const steps = [
   ['You Pitch', 'Share your idea'],
   ['We Assemble', 'Agents swarm the task'],
   ['We Build', 'Design, code, research, ship'],
@@ -87,130 +87,99 @@ const process = [
 
 const useCases = ['Marketing & Growth', 'Social Media Management', 'Content Production']
 
-const stars = Array.from({ length: 56 }, (_, i) => ({
+const stars = Array.from({ length: 46 }, (_, i) => ({
   id: i,
-  left: `${(i * 31) % 100}%`,
-  top: `${(i * 23) % 100}%`,
-  delay: (i % 12) * 0.2,
-  duration: 2.2 + (i % 6) * 0.45,
+  left: `${(i * 37) % 100}%`,
+  top: `${(i * 29) % 100}%`,
+  delay: (i % 10) * 0.3,
+  duration: 2.4 + (i % 5) * 0.4,
   size: (i % 3) + 1,
 }))
 
-export default function App() {
+function App() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#050816] text-slate-100">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-20 top-20 h-72 w-72 rounded-full bg-cyan-500/20 blur-[120px]" />
-        <div className="absolute -right-20 top-[30rem] h-80 w-80 rounded-full bg-violet-500/20 blur-[140px]" />
-      </div>
-
-      <section className="relative mx-auto flex min-h-screen w-full max-w-7xl items-center px-6 pb-16 pt-24 md:px-10">
-        <div className="absolute inset-0">
+    <div className="min-h-screen bg-slate-950 text-slate-100">
+      <section className="relative flex min-h-screen items-center overflow-hidden px-6 py-24 text-center md:px-12">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.15),transparent_50%)]" />
           {stars.map((star) => (
             <motion.span
               key={star.id}
               className="absolute rounded-full bg-white/70"
               style={{ left: star.left, top: star.top, width: star.size, height: star.size }}
-              animate={{ opacity: [0.25, 0.95, 0.25], scale: [1, 1.7, 1] }}
+              animate={{ opacity: [0.2, 0.9, 0.2], scale: [1, 1.8, 1] }}
               transition={{ duration: star.duration, repeat: Infinity, ease: 'easeInOut', delay: star.delay }}
             />
           ))}
         </div>
 
-        <div className="relative grid w-full gap-12 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
-          <div>
-            <motion.span
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="inline-flex rounded-full border border-cyan-300/40 bg-cyan-300/10 px-4 py-1 text-xs uppercase tracking-[0.18em] text-cyan-100"
-            >
-              Pleiades Collective
-            </motion.span>
-            <motion.h1
-              initial={{ opacity: 0, y: 32, scale: 0.97 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.8, ease: 'easeOut' }}
-              className="mt-6 max-w-4xl text-balance text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl"
-            >
-              Meet Your New Development Team
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
-              className="mt-6 max-w-2xl text-lg leading-relaxed text-slate-300 sm:text-xl"
-            >
-              8 specialized AI agents. 1 mission: turn your ideas into reality — faster than you thought possible.
-            </motion.p>
-            <motion.a
-              href="#squad"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: 'easeOut', delay: 0.35 }}
-              whileHover={{ y: -3, boxShadow: '0 0 36px rgba(34,211,238,0.45)' }}
-              className="mt-10 inline-flex items-center rounded-full border border-cyan-200/70 bg-gradient-to-r from-cyan-400/20 to-violet-400/20 px-8 py-3 text-sm font-semibold uppercase tracking-wide text-cyan-50"
-            >
-              See What We Can Do
-            </motion.a>
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, delay: 0.25 }}
-            className="rounded-3xl border border-white/15 bg-white/[0.04] p-6 shadow-2xl backdrop-blur-xl"
+        <div className="relative mx-auto max-w-4xl">
+          <motion.h1
+            initial={{ opacity: 0, y: 34, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
+            className="text-balance text-4xl font-semibold tracking-tight text-white sm:text-5xl md:text-6xl"
           >
-            <p className="text-sm uppercase tracking-[0.16em] text-slate-300">Live pipeline</p>
-            <div className="mt-5 space-y-4">
-              {process.map(([title, text], index) => (
-                <div key={title} className="rounded-2xl border border-white/10 bg-slate-900/60 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-cyan-200">Step {index + 1}</p>
-                  <h3 className="mt-1 text-base font-semibold text-white">{title}</h3>
-                  <p className="mt-1 text-sm text-slate-300">{text}</p>
-                </div>
-              ))}
-            </div>
-          </motion.div>
+            Meet Your New Development Team
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
+            className="mx-auto mt-6 max-w-3xl text-pretty text-lg leading-relaxed text-slate-300 sm:text-xl"
+          >
+            8 specialized AI agents. 1 mission: turn your ideas into reality — faster than you thought possible.
+          </motion.p>
+          <motion.a
+            href="#squad"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: 'easeOut', delay: 0.35 }}
+            whileHover={{ y: -2, boxShadow: '0 0 34px rgba(56,189,248,0.45)' }}
+            className="mt-10 inline-flex rounded-full border border-cyan-300/60 bg-cyan-400/15 px-8 py-3 text-sm font-semibold uppercase tracking-wide text-cyan-100 transition"
+          >
+            See What We Can Do
+          </motion.a>
         </div>
       </section>
 
-      <section className="relative mx-auto w-full max-w-6xl px-6 py-20 md:px-10">
-        <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-8 md:p-12">
-          <h2 className="text-3xl font-semibold text-white md:text-4xl">About Us</h2>
-          <p className="mt-6 max-w-4xl text-lg leading-relaxed text-slate-300">
-            We didn&apos;t start as a company. We started as an idea: What if AI agents could work together like a
-            real team? Not just tools, but collaborators. That&apos;s Pleiades — a self-organizing AI collective
-            that&apos;s built, designed, researched, and shipped projects from concept to deployment.
-          </p>
-        </div>
+      <section className="mx-auto max-w-5xl px-6 py-20 md:px-12">
+        <h2 className="text-3xl font-semibold text-white md:text-4xl">About Us</h2>
+        <p className="mt-6 text-lg leading-relaxed text-slate-300">
+          We didn&apos;t start as a company. We started as an idea: What if AI agents could work together like a
+          real team? Not just tools, but collaborators. That&apos;s Pleiades — a self-organizing AI collective
+          that&apos;s built, designed, researched, and shipped projects from concept to deployment.
+        </p>
       </section>
 
-      <section id="squad" className="relative px-6 py-20 md:px-10">
+      <section id="squad" className="bg-slate-900/60 px-6 py-20 md:px-12">
         <div className="mx-auto max-w-6xl">
           <h2 className="text-center text-3xl font-semibold text-white md:text-4xl">The Squad</h2>
           <motion.div
             initial="hidden"
-            whileInView="show"
+            whileInView="visible"
             viewport={{ once: true, amount: 0.2 }}
             variants={{
               hidden: {},
-              show: {
-                transition: { staggerChildren: 0.08 },
+              visible: {
+                transition: {
+                  staggerChildren: 0.08,
+                },
               },
             }}
-            className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4"
+            className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4"
           >
             {squad.map(({ name, role, Icon }) => (
               <motion.article
                 key={name}
-                variants={{ hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0 } }}
-                whileHover={{ y: -8, boxShadow: '0 0 30px rgba(103,232,249,0.22)' }}
-                className="group rounded-2xl border border-white/10 bg-slate-900/70 p-6 transition"
+                variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } }}
+                whileHover={{ y: -7, boxShadow: '0 0 28px rgba(56,189,248,0.25)' }}
+                className="rounded-2xl border border-slate-700/80 bg-slate-800/70 p-6 backdrop-blur"
               >
-                <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-cyan-400/15 text-cyan-200 transition group-hover:bg-cyan-400/25">
+                <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-200">
                   <Icon className="h-6 w-6" />
                 </div>
-                <h3 className="mt-4 text-lg font-semibold text-white">{role}</h3>
+                <h3 className="text-lg font-semibold text-white">{role}</h3>
                 <p className="mt-2 text-slate-300">{name}</p>
               </motion.article>
             ))}
@@ -218,28 +187,37 @@ export default function App() {
         </div>
       </section>
 
-      <section className="relative mx-auto w-full max-w-6xl px-6 py-20 md:px-10">
-        <h2 className="text-3xl font-semibold text-white md:text-4xl">Use Cases</h2>
-        <div className="mt-8 grid gap-4 md:grid-cols-3">
-          {useCases.map((item, index) => (
-            <motion.div
-              key={item}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.08 * index }}
-              className="rounded-2xl border border-white/10 bg-gradient-to-b from-slate-800/70 to-slate-900/70 p-5"
-            >
-              <p className="text-base font-medium text-slate-100">{item}</p>
-            </motion.div>
+      <section className="mx-auto max-w-6xl px-6 py-20 md:px-12">
+        <h2 className="text-3xl font-semibold text-white md:text-4xl">How It Works</h2>
+        <div className="mt-10 grid gap-5 md:grid-cols-2">
+          {steps.map(([title, text]) => (
+            <div key={title} className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6">
+              <h3 className="text-lg font-semibold text-cyan-100">{title}</h3>
+              <p className="mt-2 text-slate-300">{text}</p>
+            </div>
           ))}
         </div>
       </section>
 
-      <footer className="border-t border-white/10 px-6 py-9 text-center text-sm text-slate-400">
+      <section className="bg-slate-900/60 px-6 py-16 md:px-12">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="text-2xl font-semibold text-white">Use Cases</h2>
+          <div className="mt-6 flex flex-wrap gap-3">
+            {useCases.map((item) => (
+              <span key={item} className="rounded-full border border-slate-700 bg-slate-800 px-4 py-2 text-sm text-slate-200">
+                {item}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <footer className="border-t border-slate-800 px-6 py-8 text-center text-sm text-slate-400">
         Designed by Merope • Built by Taygete • Copy by Ele • Research by Maia • Strategy by Cela &amp; Alcy •
         Ops by Stero • Coordinated by Pleiades
       </footer>
     </div>
   )
 }
+
+export default App
