@@ -311,7 +311,7 @@ function App() {
                 <p className="mt-2 text-slate-300">{text}</p>
               </div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
