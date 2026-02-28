@@ -1,10 +1,25 @@
-import type { SVGProps, JSX } from 'react'
+import type { JSX, SVGProps } from 'react'
 import { motion } from 'framer-motion'
 
 type SquadMember = {
   name: string
   role: string
   Icon: (props: SVGProps<SVGSVGElement>) => JSX.Element
+}
+
+type SkyStar = {
+  id: string
+  x: number
+  y: number
+  size: number
+  depth: 'near' | 'mid' | 'far'
+}
+
+type ConstellationStar = {
+  id: string
+  x: number
+  y: number
+  strength: number
 }
 
 const SparkIcon = (props: SVGProps<SVGSVGElement>) => (
@@ -87,73 +102,172 @@ const steps = [
 
 const useCases = ['Marketing & Growth', 'Social Media Management', 'Content Production']
 
-const stars = Array.from({ length: 46 }, (_, i) => ({
-  id: i,
-  left: `${(i * 37) % 100}%`,
-  top: `${(i * 29) % 100}%`,
-  delay: (i % 10) * 0.3,
-  duration: 2.4 + (i % 5) * 0.4,
-  size: (i % 3) + 1,
-}))
+const backgroundStars: SkyStar[] = Array.from({ length: 70 }, (_, i) => {
+  const baseX = (i * 37 + 19) % 100
+  const baseY = (i * 23 + 11) % 100
+  const depth = i % 3 === 0 ? 'near' : i % 3 === 1 ? 'mid' : 'far'
+  const size = depth === 'near' ? 2.4 : depth === 'mid' ? 1.8 : 1.2
+
+  return { id: `bg-${i}`, x: baseX, y: baseY, size, depth }
+})
+
+const pleiadesCluster: ConstellationStar[] = [
+  { id: 'atlas', x: 23, y: 55, strength: 0.68 },
+  { id: 'pleione', x: 23, y: 48, strength: 0.56 },
+  { id: 'alcyone', x: 40, y: 47, strength: 1 },
+  { id: 'maia', x: 55, y: 37, strength: 0.8 },
+  { id: 'asterope', x: 57, y: 23, strength: 0.52 },
+  { id: 'taygeta', x: 67, y: 31, strength: 0.82 },
+  { id: 'celaeno', x: 72, y: 41, strength: 0.6 },
+  { id: 'electra', x: 70, y: 50, strength: 0.75 },
+  { id: 'merope', x: 52, y: 61, strength: 0.7 },
+]
+
+const constellationLinks: Array<[string, string]> = [
+  ['atlas', 'alcyone'],
+  ['alcyone', 'maia'],
+  ['alcyone', 'merope'],
+  ['maia', 'taygeta'],
+  ['taygeta', 'celaeno'],
+  ['celaeno', 'electra'],
+  ['electra', 'merope'],
+  ['maia', 'electra'],
+  ['maia', 'asterope'],
+]
+
+function getPoint(id: string) {
+  return pleiadesCluster.find((star) => star.id === id)
+}
 
 function App() {
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
-      <section className="relative flex min-h-screen items-center overflow-hidden px-6 py-24 text-center md:px-12">
+    <div className="h-screen snap-y snap-mandatory overflow-y-auto bg-[#020611] text-slate-100 scroll-smooth">
+      <section className="relative flex min-h-screen snap-start items-center overflow-hidden px-6 py-24 text-center md:px-12">
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.15),transparent_50%)]" />
-          {stars.map((star) => (
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_24%,rgba(56,189,248,0.22),transparent_38%),radial-gradient(circle_at_75%_22%,rgba(99,102,241,0.34),transparent_42%),radial-gradient(circle_at_55%_85%,rgba(14,165,233,0.16),transparent_46%)]" />
+
+          {backgroundStars.map((star, index) => (
             <motion.span
               key={star.id}
-              className="absolute rounded-full bg-white/70"
-              style={{ left: star.left, top: star.top, width: star.size, height: star.size }}
-              animate={{ opacity: [0.2, 0.9, 0.2], scale: [1, 1.8, 1] }}
-              transition={{ duration: star.duration, repeat: Infinity, ease: 'easeInOut', delay: star.delay }}
+              className="absolute rounded-full bg-slate-100"
+              style={{
+                left: `${star.x}%`,
+                top: `${star.y}%`,
+                width: `${star.size}px`,
+                height: `${star.size}px`,
+                boxShadow:
+                  star.depth === 'near'
+                    ? '0 0 12px rgba(186,230,253,0.8)'
+                    : star.depth === 'mid'
+                      ? '0 0 8px rgba(186,230,253,0.55)'
+                      : '0 0 4px rgba(186,230,253,0.35)',
+              }}
+              animate={{
+                opacity: star.depth === 'near' ? [0.25, 0.9, 0.35, 0.95, 0.25] : [0.15, 0.65, 0.2, 0.7, 0.15],
+                scale: star.depth === 'near' ? [1, 1.45, 0.92, 1.35, 1] : [1, 1.16, 0.95, 1.13, 1],
+              }}
+              transition={{
+                duration: 2.6 + (index % 7) * 0.55,
+                repeat: Infinity,
+                ease: 'easeInOut',
+                delay: (index % 12) * 0.12,
+              }}
             />
           ))}
+
+          <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            {constellationLinks.map(([a, b], index) => {
+              const from = getPoint(a)
+              const to = getPoint(b)
+              if (!from || !to) return null
+              return (
+                <motion.line
+                  key={`${a}-${b}`}
+                  x1={from.x}
+                  y1={from.y}
+                  x2={to.x}
+                  y2={to.y}
+                  stroke="rgba(186,230,253,0.78)"
+                  strokeWidth="0.24"
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ pathLength: 1, opacity: [0.3, 0.9, 0.45] }}
+                  transition={{
+                    pathLength: { duration: 1.8, delay: 0.25 + index * 0.08, ease: 'easeOut' },
+                    opacity: { duration: 3.6, delay: 0.4 + index * 0.05, repeat: Infinity, ease: 'easeInOut' },
+                  }}
+                />
+              )
+            })}
+
+            {pleiadesCluster.map((star, index) => {
+              const radius = 0.25 + star.strength * 0.42
+              const glow = 0.75 + star.strength * 0.7
+              return (
+                <g key={star.id}>
+                  <motion.circle
+                    cx={star.x}
+                    cy={star.y}
+                    r={glow}
+                    fill="rgba(125,211,252,0.22)"
+                    animate={{ opacity: [0.12, 0.5, 0.16] }}
+                    transition={{ duration: 2.7 + index * 0.14, repeat: Infinity, ease: 'easeInOut' }}
+                  />
+                  <motion.circle
+                    cx={star.x}
+                    cy={star.y}
+                    r={radius}
+                    fill="rgba(240,249,255,0.98)"
+                    animate={{ opacity: [0.45, 1, 0.5], scale: [1, 1.35, 1] }}
+                    transition={{ duration: 2.1 + (index % 4) * 0.32, repeat: Infinity, ease: 'easeInOut' }}
+                  />
+                </g>
+              )
+            })}
+          </svg>
         </div>
 
         <div className="relative mx-auto max-w-4xl">
           <motion.h1
-            initial={{ opacity: 0, y: 34, scale: 0.96 }}
+            initial={{ opacity: 0, y: 26, scale: 0.94 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
-            className="text-balance text-4xl font-semibold tracking-tight text-white sm:text-5xl md:text-6xl"
+            transition={{ duration: 0.9, ease: 'easeOut' }}
+            className="bg-gradient-to-b from-white to-cyan-100 bg-clip-text text-6xl font-semibold tracking-tight text-transparent drop-shadow-[0_0_18px_rgba(186,230,253,0.35)] sm:text-7xl md:text-8xl lg:text-9xl"
           >
-            Meet Your New Development Team
+            Pleiades
           </motion.h1>
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
-            className="mx-auto mt-6 max-w-3xl text-pretty text-lg leading-relaxed text-slate-300 sm:text-xl"
+            transition={{ duration: 0.75, delay: 0.2 }}
+            className="mx-auto mt-6 max-w-3xl text-xl text-slate-100 sm:text-2xl"
           >
-            8 specialized AI agents. 1 mission: turn your ideas into reality — faster than you thought possible.
+            Where ideas constellate.
           </motion.p>
-          <motion.a
-            href="#squad"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: 'easeOut', delay: 0.35 }}
-            whileHover={{ y: -2, boxShadow: '0 0 34px rgba(56,189,248,0.45)' }}
-            className="mt-10 inline-flex rounded-full border border-cyan-300/60 bg-cyan-400/15 px-8 py-3 text-sm font-semibold uppercase tracking-wide text-cyan-100 transition"
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 0.45 }}
+            className="mx-auto mt-5 max-w-3xl text-sm leading-relaxed text-slate-300 sm:text-base"
           >
-            See What We Can Do
-          </motion.a>
+            A cosmic collective of specialized AI agents aligning marketing, design, research, strategy, and
+            engineering into one shared orbit.
+          </motion.p>
         </div>
       </section>
 
-      <section className="mx-auto max-w-5xl px-6 py-20 md:px-12">
-        <h2 className="text-3xl font-semibold text-white md:text-4xl">About Us</h2>
-        <p className="mt-6 text-lg leading-relaxed text-slate-300">
-          We didn&apos;t start as a company. We started as an idea: What if AI agents could work together like a
-          real team? Not just tools, but collaborators. That&apos;s Pleiades — a self-organizing AI collective
-          that&apos;s built, designed, researched, and shipped projects from concept to deployment.
-        </p>
+      <section className="mx-auto flex min-h-screen snap-start w-full max-w-5xl items-center px-6 py-20 md:px-12">
+        <div>
+          <h2 className="text-3xl font-semibold text-white md:text-4xl">About Us</h2>
+          <p className="mt-6 text-lg leading-relaxed text-slate-300">
+            We didn&apos;t start as a company. We started as an idea: What if AI agents could work together like a
+            real team? Not just tools, but collaborators. That&apos;s Pleiades — a self-organizing AI collective
+            that&apos;s built, designed, researched, and shipped projects from concept to deployment.
+          </p>
+        </div>
       </section>
 
-      <section id="squad" className="bg-slate-900/60 px-6 py-20 md:px-12">
-        <div className="mx-auto max-w-6xl">
+      <section id="squad" className="flex min-h-screen snap-start items-center bg-slate-900/60 px-6 py-20 md:px-12">
+        <div className="mx-auto w-full max-w-6xl">
           <h2 className="text-center text-3xl font-semibold text-white md:text-4xl">The Squad</h2>
           <motion.div
             initial="hidden"
@@ -187,20 +301,22 @@ function App() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-20 md:px-12">
-        <h2 className="text-3xl font-semibold text-white md:text-4xl">How It Works</h2>
-        <div className="mt-10 grid gap-5 md:grid-cols-2">
-          {steps.map(([title, text]) => (
-            <div key={title} className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6">
-              <h3 className="text-lg font-semibold text-cyan-100">{title}</h3>
-              <p className="mt-2 text-slate-300">{text}</p>
-            </div>
-          ))}
+      <section className="mx-auto flex min-h-screen snap-start w-full max-w-6xl items-center px-6 py-20 md:px-12">
+        <div className="w-full">
+          <h2 className="text-3xl font-semibold text-white md:text-4xl">How It Works</h2>
+          <div className="mt-10 grid gap-5 md:grid-cols-2">
+            {steps.map(([title, text]) => (
+              <div key={title} className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6">
+                <h3 className="text-lg font-semibold text-cyan-100">{title}</h3>
+                <p className="mt-2 text-slate-300">{text}</p>
+              </div>
+            ))}
+          </motion.div>
         </div>
       </section>
 
-      <section className="bg-slate-900/60 px-6 py-16 md:px-12">
-        <div className="mx-auto max-w-6xl">
+      <section className="flex min-h-screen snap-start items-center bg-slate-900/60 px-6 py-16 md:px-12">
+        <div className="mx-auto w-full max-w-6xl">
           <h2 className="text-2xl font-semibold text-white">Use Cases</h2>
           <div className="mt-6 flex flex-wrap gap-3">
             {useCases.map((item) => (
@@ -212,9 +328,8 @@ function App() {
         </div>
       </section>
 
-      <footer className="border-t border-slate-800 px-6 py-8 text-center text-sm text-slate-400">
-        Designed by Merope • Built by Taygete • Copy by Ele • Research by Maia • Strategy by Cela &amp; Alcy •
-        Ops by Stero • Coordinated by Pleiades
+      <footer className="flex min-h-screen snap-start items-center justify-center border-t border-slate-800 px-6 py-8 text-center text-sm text-slate-400">
+        <p className="max-w-4xl">Designed by Merope • Built by Taygete • Copy by Ele • Research by Maia • Strategy by Cela &amp; Alcy • Ops by Stero • Coordinated by Pleiades</p>
       </footer>
     </div>
   )
